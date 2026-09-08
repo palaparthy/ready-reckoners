@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "AWS Networking Concepts Ready Reckoner", "locale": "en", "output": "aws-networking-ready-reckoner.html", "quality_profile": "showcase", "viewBox": [1390, 720] },
+  "components": [
+    { "id": "aws_vpc", "type": "cloud", "label": "Amazon VPC", "sublabel": "regional isolated network", "pos": [30, 300], "size": [150, 66], "tag": "REGIONAL" },
+    { "id": "aws_subnet", "type": "cloud", "label": "Subnet", "sublabel": "one Availability Zone", "pos": [255, 300], "size": [160, 66], "tag": "ONE AZ" },
+    { "id": "aws_addressing", "type": "frontend", "label": "IP addressing", "sublabel": "CIDR - private/public - EIP", "pos": [255, 90], "size": [160, 66] },
+    { "id": "aws_security", "type": "security", "label": "Security controls", "sublabel": "Security groups + network ACLs", "pos": [500, 90], "size": [170, 66] },
+    { "id": "aws_workloads", "type": "backend", "label": "Workloads", "sublabel": "EC2 - EKS - RDS", "pos": [500, 300], "size": [170, 66] },
+    { "id": "aws_routes", "type": "messagebus", "label": "Route tables", "sublabel": "destination and target", "pos": [750, 300], "size": [160, 66] },
+    { "id": "aws_internet_path", "type": "cloud", "label": "Internet path", "sublabel": "Internet Gateway or NAT Gateway", "pos": [990, 90], "size": [180, 66] },
+    { "id": "aws_internet", "type": "external", "label": "Internet", "sublabel": "public destinations", "pos": [1240, 90], "size": [140, 66] },
+    { "id": "aws_private_path", "type": "cloud", "label": "Private VPC connectivity", "sublabel": "VPC Peering or Transit Gateway", "pos": [990, 300], "size": [180, 66] },
+    { "id": "aws_peers", "type": "external", "label": "Peer VPCs", "sublabel": "same or other Regions", "pos": [1240, 300], "size": [140, 66] },
+    { "id": "aws_hybrid_path", "type": "cloud", "label": "Hybrid connectivity", "sublabel": "VPN or Direct Connect", "pos": [990, 510], "size": [180, 66] },
+    { "id": "aws_onprem", "type": "external", "label": "On-prem / multicloud", "sublabel": "customer gateway edge", "pos": [1240, 510], "size": [140, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "AWS Region - VPC spans Availability Zones; each subnet stays in one AZ", "wraps": ["aws_vpc", "aws_subnet", "aws_addressing", "aws_security", "aws_workloads", "aws_routes", "aws_internet_path", "aws_private_path", "aws_hybrid_path"], "pad": 24 }
+  ],
+  "connections": [
+    { "id": "aws_vpc_subnet", "from": "aws_vpc", "to": "aws_subnet", "label": "contains" },
+    { "id": "aws_addressing_subnet", "from": "aws_addressing", "to": "aws_subnet", "label": "assigns CIDR", "labelAt": [335, 170] },
+    { "id": "aws_subnet_workloads", "from": "aws_subnet", "to": "aws_workloads", "label": "hosts ENIs" },
+    { "id": "aws_security_workloads", "from": "aws_security", "to": "aws_workloads", "label": "filters flows", "variant": "security", "labelAt": [585, 170] },
+    { "id": "aws_workloads_routes", "from": "aws_workloads", "to": "aws_routes", "label": "subnet route" },
+    { "id": "aws_routes_internet", "from": "aws_routes", "to": "aws_internet_path", "label": "IGW or NAT target" },
+    { "id": "aws_internet_external", "from": "aws_internet_path", "to": "aws_internet" },
+    { "id": "aws_routes_private", "from": "aws_routes", "to": "aws_private_path", "label": "peer route", "labelAt": [915, 390] },
+    { "id": "aws_private_external", "from": "aws_private_path", "to": "aws_peers" },
+    { "id": "aws_routes_hybrid", "from": "aws_routes", "to": "aws_hybrid_path", "label": "propagated route" },
+    { "id": "aws_hybrid_external", "from": "aws_hybrid_path", "to": "aws_onprem" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Scope", "items": ["Organization - OU - AWS account contains regional resources", "A VPC spans Availability Zones in one Region", "Each subnet belongs to exactly one Availability Zone"] },
+    { "dot": "rose", "title": "Security", "items": ["Security groups are stateful and attach to network interfaces", "Network ACLs are stateless and apply at subnet boundaries"] },
+    { "dot": "emerald", "title": "Connectivity", "items": ["Internet Gateways serve public paths; NAT Gateways serve outbound IPv4 paths", "VPN and Direct Connect extend private routing"] }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Google Cloud Networking Concepts Ready Reckoner", "locale": "en", "output": "google-cloud-networking-ready-reckoner.html", "quality_profile": "showcase", "viewBox": [1390, 720] },
+  "components": [
+    { "id": "gcp_vpc", "type": "cloud", "label": "VPC network", "sublabel": "global resource", "pos": [30, 300], "size": [150, 66], "tag": "GLOBAL" },
+    { "id": "gcp_subnet", "type": "cloud", "label": "Subnet", "sublabel": "regional IP range", "pos": [255, 300], "size": [160, 66], "tag": "REGIONAL" },
+    { "id": "gcp_addressing", "type": "frontend", "label": "IP addressing", "sublabel": "CIDR - internal - external", "pos": [255, 90], "size": [160, 66] },
+    { "id": "gcp_security", "type": "security", "label": "Firewall controls", "sublabel": "policies and VPC rules", "pos": [500, 90], "size": [170, 66] },
+    { "id": "gcp_workloads", "type": "backend", "label": "Workloads", "sublabel": "VMs - GKE - Cloud SQL", "pos": [500, 300], "size": [170, 66] },
+    { "id": "gcp_routes", "type": "messagebus", "label": "Routes and Cloud Router", "sublabel": "static routes + BGP", "pos": [750, 300], "size": [160, 66] },
+    { "id": "gcp_internet_path", "type": "cloud", "label": "Internet path", "sublabel": "external IP or Cloud NAT", "pos": [990, 90], "size": [180, 66] },
+    { "id": "gcp_internet", "type": "external", "label": "Internet", "sublabel": "public destinations", "pos": [1240, 90], "size": [140, 66] },
+    { "id": "gcp_private_path", "type": "cloud", "label": "Private VPC connectivity", "sublabel": "VPC Peering or NCC", "pos": [990, 300], "size": [180, 66] },
+    { "id": "gcp_peers", "type": "external", "label": "Peer networks", "sublabel": "other VPC networks", "pos": [1240, 300], "size": [140, 66] },
+    { "id": "gcp_hybrid_path", "type": "cloud", "label": "Hybrid connectivity", "sublabel": "Cloud VPN or Interconnect", "pos": [990, 510], "size": [180, 66] },
+    { "id": "gcp_onprem", "type": "external", "label": "On-prem / multicloud", "sublabel": "peer network edge", "pos": [1240, 510], "size": [140, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Google Cloud - global VPC with regional subnets", "wraps": ["gcp_vpc", "gcp_subnet", "gcp_addressing", "gcp_security", "gcp_workloads", "gcp_routes", "gcp_internet_path", "gcp_private_path", "gcp_hybrid_path"], "pad": 24 }
+  ],
+  "connections": [
+    { "id": "gcp_vpc_subnet", "from": "gcp_vpc", "to": "gcp_subnet", "label": "contains" },
+    { "id": "gcp_addressing_subnet", "from": "gcp_addressing", "to": "gcp_subnet", "label": "assigns ranges", "labelAt": [335, 170] },
+    { "id": "gcp_subnet_workloads", "from": "gcp_subnet", "to": "gcp_workloads", "label": "connects NICs" },
+    { "id": "gcp_security_workloads", "from": "gcp_security", "to": "gcp_workloads", "label": "filters flows", "variant": "security", "labelAt": [585, 170] },
+    { "id": "gcp_workloads_routes", "from": "gcp_workloads", "to": "gcp_routes", "label": "selects route" },
+    { "id": "gcp_routes_internet", "from": "gcp_routes", "to": "gcp_internet_path", "label": "default route" },
+    { "id": "gcp_internet_external", "from": "gcp_internet_path", "to": "gcp_internet" },
+    { "id": "gcp_routes_private", "from": "gcp_routes", "to": "gcp_private_path", "label": "peer CIDR", "labelAt": [915, 390] },
+    { "id": "gcp_private_external", "from": "gcp_private_path", "to": "gcp_peers" },
+    { "id": "gcp_routes_hybrid", "from": "gcp_routes", "to": "gcp_hybrid_path", "label": "BGP or static" },
+    { "id": "gcp_hybrid_external", "from": "gcp_hybrid_path", "to": "gcp_onprem" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Scope", "items": ["Organization - Folder - Project contains service resources", "VPC networks are global; subnets and Cloud Routers are regional", "VM instances are zonal resources"] },
+    { "dot": "rose", "title": "Security", "items": ["Distributed firewall rules apply at the VPC level", "Routes decide reachability; firewall rules decide permission"] },
+    { "dot": "emerald", "title": "Connectivity", "items": ["Cloud NAT provides outbound translation without unsolicited inbound sessions", "Cloud VPN and Cloud Interconnect reach peer networks"] }
+  ]
+}

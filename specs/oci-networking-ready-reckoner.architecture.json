@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "OCI Networking Concepts Ready Reckoner", "locale": "en", "output": "oci-networking-ready-reckoner.html", "quality_profile": "showcase", "viewBox": [1390, 720] },
+  "components": [
+    { "id": "oci_vcn", "type": "cloud", "label": "Virtual Cloud Network", "sublabel": "regional private network", "pos": [30, 300], "size": [150, 66], "tag": "REGIONAL" },
+    { "id": "oci_subnet", "type": "cloud", "label": "Subnet", "sublabel": "regional or AD-specific", "pos": [255, 300], "size": [160, 66] },
+    { "id": "oci_addressing", "type": "frontend", "label": "IP addressing", "sublabel": "CIDR - private - public", "pos": [255, 90], "size": [160, 66] },
+    { "id": "oci_security", "type": "security", "label": "Security controls", "sublabel": "Security Lists and NSGs", "pos": [500, 90], "size": [170, 66] },
+    { "id": "oci_workloads", "type": "backend", "label": "Workloads", "sublabel": "Compute - DB Systems - OKE", "pos": [500, 300], "size": [170, 66] },
+    { "id": "oci_routes", "type": "messagebus", "label": "VCN route tables", "sublabel": "destination and next-hop", "pos": [750, 300], "size": [160, 66] },
+    { "id": "oci_internet_path", "type": "cloud", "label": "Internet path", "sublabel": "Internet Gateway or NAT Gateway", "pos": [990, 90], "size": [180, 66] },
+    { "id": "oci_internet", "type": "external", "label": "Internet", "sublabel": "public destinations", "pos": [1240, 90], "size": [140, 66] },
+    { "id": "oci_private_path", "type": "cloud", "label": "Private connectivity", "sublabel": "Service Gateway or LPG", "pos": [990, 300], "size": [180, 66] },
+    { "id": "oci_peers", "type": "external", "label": "Private peers", "sublabel": "OCI services or VCN", "pos": [1240, 300], "size": [140, 66] },
+    { "id": "oci_hybrid_path", "type": "cloud", "label": "Dynamic Routing Gateway", "sublabel": "Site-to-Site VPN or FastConnect", "pos": [990, 510], "size": [180, 66] },
+    { "id": "oci_onprem", "type": "external", "label": "On-prem / remote VCN", "sublabel": "peer network edge", "pos": [1240, 510], "size": [140, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "OCI region - VCN and regional subnets can span Availability Domains", "wraps": ["oci_vcn", "oci_subnet", "oci_addressing", "oci_security", "oci_workloads", "oci_routes", "oci_internet_path", "oci_private_path", "oci_hybrid_path"], "pad": 24 }
+  ],
+  "connections": [
+    { "id": "oci_vcn_subnet", "from": "oci_vcn", "to": "oci_subnet", "label": "contains" },
+    { "id": "oci_addressing_subnet", "from": "oci_addressing", "to": "oci_subnet", "label": "assigns CIDR", "labelAt": [335, 170] },
+    { "id": "oci_subnet_workloads", "from": "oci_subnet", "to": "oci_workloads", "label": "hosts VNICs" },
+    { "id": "oci_security_workloads", "from": "oci_security", "to": "oci_workloads", "label": "filters flows", "variant": "security", "labelAt": [585, 170] },
+    { "id": "oci_workloads_routes", "from": "oci_workloads", "to": "oci_routes", "label": "subnet route" },
+    { "id": "oci_routes_internet", "from": "oci_routes", "to": "oci_internet_path", "label": "IGW or NAT target" },
+    { "id": "oci_internet_external", "from": "oci_internet_path", "to": "oci_internet" },
+    { "id": "oci_routes_private", "from": "oci_routes", "to": "oci_private_path", "label": "service/LPG route", "labelAt": [895, 390] },
+    { "id": "oci_private_external", "from": "oci_private_path", "to": "oci_peers" },
+    { "id": "oci_routes_hybrid", "from": "oci_routes", "to": "oci_hybrid_path", "label": "DRG route" },
+    { "id": "oci_hybrid_external", "from": "oci_hybrid_path", "to": "oci_onprem" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Scope", "items": ["Tenancy - Compartments contain regional resources", "A VCN is scoped to one OCI region", "Subnets can be regional or Availability Domain-specific"] },
+    { "dot": "rose", "title": "Security", "items": ["Security Lists apply to every VNIC in a subnet", "NSGs apply to selected VNICs across subnets"] },
+    { "dot": "emerald", "title": "Connectivity", "items": ["Internet, NAT, and Service Gateways serve distinct reachability patterns", "A DRG anchors VPN, FastConnect, and remote routing"] }
+  ]
+}

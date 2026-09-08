@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Microsoft Azure Networking Concepts Ready Reckoner", "locale": "en", "output": "microsoft-azure-networking-ready-reckoner.html", "quality_profile": "showcase", "viewBox": [1390, 720] },
+  "components": [
+    { "id": "az_vnet", "type": "cloud", "label": "Virtual Network", "sublabel": "regional private network", "pos": [30, 300], "size": [150, 66], "tag": "REGIONAL" },
+    { "id": "az_subnet", "type": "cloud", "label": "Subnet", "sublabel": "address range in one VNet", "pos": [255, 300], "size": [160, 66] },
+    { "id": "az_addressing", "type": "frontend", "label": "IP addressing", "sublabel": "VNet CIDR - private/public", "pos": [255, 90], "size": [160, 66] },
+    { "id": "az_security", "type": "security", "label": "Network Security Group", "sublabel": "stateful subnet/NIC rules", "pos": [500, 90], "size": [170, 66] },
+    { "id": "az_workloads", "type": "backend", "label": "Workloads", "sublabel": "VMs - AKS - Azure SQL", "pos": [500, 300], "size": [170, 66] },
+    { "id": "az_routes", "type": "messagebus", "label": "Route table and UDRs", "sublabel": "system and custom routes", "pos": [750, 300], "size": [160, 66] },
+    { "id": "az_internet_path", "type": "cloud", "label": "Internet path", "sublabel": "Public IP or NAT Gateway", "pos": [990, 90], "size": [180, 66] },
+    { "id": "az_internet", "type": "external", "label": "Internet", "sublabel": "public destinations", "pos": [1240, 90], "size": [140, 66] },
+    { "id": "az_private_path", "type": "cloud", "label": "Private connectivity", "sublabel": "VNet peering and Private Link", "pos": [990, 300], "size": [180, 66] },
+    { "id": "az_peers", "type": "external", "label": "Private peers", "sublabel": "VNets and PaaS endpoints", "pos": [1240, 300], "size": [140, 66] },
+    { "id": "az_hybrid_path", "type": "cloud", "label": "Hybrid connectivity", "sublabel": "VPN Gateway or ExpressRoute", "pos": [990, 510], "size": [180, 66] },
+    { "id": "az_onprem", "type": "external", "label": "On-prem / partner", "sublabel": "customer network", "pos": [1240, 510], "size": [140, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Azure region - a VNet spans supported availability zones", "wraps": ["az_vnet", "az_subnet", "az_addressing", "az_security", "az_workloads", "az_routes", "az_internet_path", "az_private_path", "az_hybrid_path"], "pad": 24 }
+  ],
+  "connections": [
+    { "id": "az_vnet_subnet", "from": "az_vnet", "to": "az_subnet", "label": "contains" },
+    { "id": "az_addressing_subnet", "from": "az_addressing", "to": "az_subnet", "label": "assigns prefix", "labelAt": [335, 170] },
+    { "id": "az_subnet_workloads", "from": "az_subnet", "to": "az_workloads", "label": "connects NICs" },
+    { "id": "az_security_workloads", "from": "az_security", "to": "az_workloads", "label": "filters flows", "variant": "security", "labelAt": [585, 170] },
+    { "id": "az_workloads_routes", "from": "az_workloads", "to": "az_routes", "label": "effective route" },
+    { "id": "az_routes_internet", "from": "az_routes", "to": "az_internet_path", "label": "public route" },
+    { "id": "az_internet_external", "from": "az_internet_path", "to": "az_internet" },
+    { "id": "az_routes_private", "from": "az_routes", "to": "az_private_path", "label": "private prefix", "labelAt": [902, 390] },
+    { "id": "az_private_external", "from": "az_private_path", "to": "az_peers" },
+    { "id": "az_routes_hybrid", "from": "az_routes", "to": "az_hybrid_path", "label": "gateway route" },
+    { "id": "az_hybrid_external", "from": "az_hybrid_path", "to": "az_onprem" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Scope", "items": ["Tenant - Management group - Subscription - Resource group", "A VNet is scoped to one Azure region and can span supported zones", "Resource groups are lifecycle containers, not network boundaries"] },
+    { "dot": "rose", "title": "Security", "items": ["NSGs apply stateful rules to subnets or network interfaces", "UDRs change paths; NSGs allow or deny flows"] },
+    { "dot": "emerald", "title": "Connectivity", "items": ["NAT Gateway provides explicit outbound SNAT", "VPN Gateway and ExpressRoute connect hybrid networks"] }
+  ]
+}
