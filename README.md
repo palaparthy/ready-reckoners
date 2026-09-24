@@ -13,4 +13,4 @@ Each diagram is a standalone HTML artifact with light and dark themes. The corre
 
 ## Official documentation
 
-[OFFICIAL-DOCUMENTATION-LINKS] (./OFFICIAL-DOCUMENTATION-LINKS.md) maps every diagram component to first-party provider documentation. This companion index is used because the diagram renderer does not support component-level external hyperlinks.
+[OFFICIAL-DOCUMENTATION-LINKS](./OFFICIAL-DOCUMENTATION-LINKS.md) maps every diagram component to first-party provider documentation. This companion index is used because the diagram renderer does not support component-level external hyperlinks.
