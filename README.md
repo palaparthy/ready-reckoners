@@ -4,7 +4,7 @@ Interactive networking concept maps for Google Cloud, Microsoft Azure, AWS, and 
 
 ## Ready reckoners
 
-- `output/google-cloud-networking-ready-reckoner.html`
+- [Google Cloud Networking Ready Reckoner](./output/google-cloud-networking-ready-reckoner.html)
 - `output/microsoft-azure-networking-ready-reckoner.html`
 - `output/aws-networking-ready-reckoner.html`
 - `output/oci-networking-ready-reckoner.html`
